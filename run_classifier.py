@@ -1000,6 +1000,12 @@ def main(_):
       "mnli": MnliProcessor,
       "mrpc": MrpcProcessor,
       "xnli": XnliProcessor,
+      "sst": SstProcessor,
+      "qqp": QqpProcessor,
+      "qnli": QnliProcessor,
+      "rte": RteProcessor,
+      "snli": SnliProcessor,
+      "wnli": WnliProcessor
   }
 
   if not FLAGS.do_train and not FLAGS.do_eval and not FLAGS.do_predict:
