@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BERT_BASE_DIR='/home/alizaidi/nlpdev/BERT_implementations/pretrained-models/uncased_L-12_H-768_A-12'
-DATASETS='/home/alizaidi/data/glue_data/SST-2'
+DATASETS='/home/alizaidi/data/glue_data/glue_data/SST-2'
 OUTPUTS='/home/alizaidi/nlpdev/BERT_implementations/results/'
 TASK="SST"
 
