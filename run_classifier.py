@@ -160,11 +160,13 @@ class DataProcessor(object):
 
   def get_train_examples(self, data_dir):
     """Gets a collection of `InputExample`s for the train set."""
-    raise NotImplementedError()
+    return self._create_examples(
+        self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
 
   def get_dev_examples(self, data_dir):
     """Gets a collection of `InputExample`s for the dev set."""
-    raise NotImplementedError()
+    return self._create_examples(
+        self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
 
   def get_test_examples(self, data_dir):
     """Gets a collection of `InputExample`s for prediction."""
@@ -172,6 +174,10 @@ class DataProcessor(object):
 
   def get_labels(self):
     """Gets the list of labels for this data set."""
+    raise NotImplementedError()
+
+  def _create_examples(self, lines, set_type):
+    """Creates examples for the training and dev sets."""
     raise NotImplementedError()
 
   @classmethod
@@ -445,11 +451,6 @@ class QnliProcessor(DataProcessor):
 class MnliProcessor(DataProcessor):
   """Processor for the MultiNLI data set (GLUE version)."""
 
-  def get_train_examples(self, data_dir):
-    """See base class."""
-    return self._create_examples(
-        self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
-
   def get_dev_examples(self, data_dir):
     """See base class."""
     return self._create_examples(
@@ -570,15 +571,34 @@ class SnliProcessor(DataProcessor):
 class WnliProcessor(DataProcessor):
   """Processor for the WNLI data set (GLUE version)."""
 
-  def get_train_examples(self, data_dir):
+  def get_labels(self):
     """See base class."""
+    return ["0", "1"]
+
+  def _create_examples(self, lines, set_type):
+    """Creates examples for the training and dev sets."""
+    examples = []
+    for (i, line) in enumerate(lines):
+      guid = "%s-%s" % (set_type, i)
+      text_a = tokenization.convert_to_unicode(line[3])
+      label = tokenization.convert_to_unicode(line[1])
+      examples.append(
+          InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
+    return examples
+
+
+class ImdbProcessor(DataProcessor):
+  """Processor for the IMDB data set (custom)."""
+
+  def get_train_examples(self, data_dir):
+    """Gets a collection of `InputExample`s for the train set."""
     return self._create_examples(
-        self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+        self._read_tsv(os.path.join(data_dir, "train.tsv"), quotechar='"'), "train")
 
   def get_dev_examples(self, data_dir):
-    """See base class."""
+    """Gets a collection of `InputExample`s for the dev set."""
     return self._create_examples(
-        self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+        self._read_tsv(os.path.join(data_dir, "dev.tsv"), quotechar='"'), "dev")
 
   def get_test_examples(self, data_dir):
     """See base class."""
@@ -999,6 +1019,7 @@ def main(_):
       "cola": ColaProcessor,
       "mnli": MnliProcessor,
       "mrpc": MrpcProcessor,
+      "imdb": ImdbProcessor,
       "xnli": XnliProcessor,
       "sst": SstProcessor,
       "qqp": QqpProcessor,
